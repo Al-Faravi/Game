@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOID WALKER - Nexus Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- CORE CSS --- */
+        :root {
+            --primary: #ffffff; /* White/Starlight for Space theme */
+            --secondary: #00f3ff; /* Cyan accents */
+            --bg-dark: #000000;
+            --glass: rgba(20, 20, 30, 0.6);
+            --text-main: #e0e0e0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; scroll-behavior: smooth; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Rajdhani', sans-serif; overflow-x: hidden; }
+
+        /* PRELOADER */
+        #preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        .loader-circle { width: 80px; height: 80px; border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid var(--secondary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; box-shadow: 0 0 20px var(--secondary); }
+        .loader-text { font-family: 'Orbitron'; letter-spacing: 5px; animation: blink 1.5s infinite; color: var(--secondary); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* CURSOR */
+        .cursor { width: 20px; height: 20px; border: 2px solid var(--secondary); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.1s; box-shadow: 0 0 15px var(--secondary); mix-blend-mode: difference; }
+        .cursor.hovered { transform: translate(-50%, -50%) scale(2.5); background-color: var(--secondary); opacity: 0.5; }
+
+        /* NAV */
+        nav { position: fixed; top: 0; width: 100%; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #fff; text-decoration: none; font-weight: 700; }
+        .back-btn { color: #fff; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .back-btn:hover { color: var(--secondary); text-shadow: 0 0 10px var(--secondary); }
+
+        /* BACK TO TOP */
+        #backToTop { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: var(--secondary); color: #000; border: none; border-radius: 5px; font-size: 1.2rem; cursor: pointer; display: none; justify-content: center; align-items: center; z-index: 90; transition: 0.3s; }
+        #backToTop:hover { background: #fff; transform: translateY(-5px); }
+
+        /* --- GAME SPECIFIC CSS --- */
+        .game-hero {
+            height: 80vh;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), #000000), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; padding: 0 10%; position: relative; margin-top: 60px;
+        }
+        .game-info { max-width: 700px; z-index: 2; }
+        .badge { background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 5px 10px; font-size: 0.8rem; border-radius: 3px; font-family: 'Orbitron'; margin-bottom: 15px; display: inline-block; font-weight: bold; }
+        .game-title { font-family: 'Orbitron'; font-size: 4rem; line-height: 1; margin-bottom: 20px; text-transform: uppercase; color: #fff; letter-spacing: 5px; text-shadow: 0 0 20px var(--secondary); }
+        .game-desc { font-size: 1.2rem; line-height: 1.6; margin-bottom: 30px; color: #aaa; }
+        
+        .btn-play { padding: 15px 50px; background: transparent; color: var(--secondary); border: 2px solid var(--secondary); font-family: 'Orbitron'; font-weight: bold; font-size: 1.2rem; transition: 0.3s; text-transform: uppercase; cursor: pointer; }
+        .btn-play:hover { background: var(--secondary); color: #000; box-shadow: 0 0 40px var(--secondary); }
+
+        .details-container { display: grid; grid-template-columns: 2fr 1fr; gap: 50px; padding: 50px 10%; }
+        .story-box h2 { font-family: 'Orbitron'; margin-bottom: 20px; color: var(--secondary); font-size: 2rem; }
+        .story-box p { margin-bottom: 20px; line-height: 1.8; font-size: 1.1rem; color: #ccc; }
+        .specs-box { background: var(--glass); padding: 30px; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; }
+        .spec-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
+        .spec-row span:last-child { font-weight: bold; color: #fff; }
+
+        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 10% 100px; }
+        .gallery-img { height: 250px; border-radius: 5px; overflow: hidden; position: relative; opacity: 0.8; transition: 0.4s; border: 1px solid rgba(255,255,255,0.1); }
+        .gallery-img img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-img:hover { opacity: 1; transform: translateY(-5px); border: 1px solid var(--secondary); }
+
+        footer { text-align: center; padding: 30px; background: #000; color: #555; border-top: 1px solid rgba(255,255,255,0.05); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .game-hero { height: auto; padding: 150px 5% 80px; text-align: center; }
+            .game-title { font-size: 2.5rem; }
+            .details-container, .gallery { grid-template-columns: 1fr; }
+            nav { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+        <div class="loader-circle"></div>
+        <div class="loader-text">ESTABLISHING LINK...</div>
+    </div>
+
+    <div class="cursor"></div>
+    <button id="backToTop" class="hover-trigger"><i class="fas fa-arrow-up"></i></button>
+
+    <nav>
+        <a href="index.html" class="logo hover-trigger">NEXUS<span style="color:var(--secondary)">.GG</span></a>
+        <a href="index.html" class="back-btn hover-trigger"><i class="fas fa-arrow-left"></i> Mission Control</a>
+    </nav>
+
+    <section class="game-hero">
+        <div class="game-info reveal">
+            <span class="badge">RPG / EXPLORATION</span>
+            <h1 class="game-title">VOID WALKER</h1>
+            <p class="game-desc">In space, no one can hear you scream. Explore procedural galaxies, manage resources, and uncover the truth behind the silent universe.</p>
+            <button class="btn-play hover-trigger">LAUNCH SHIP</button>
+        </div>
+    </section>
+
+    <div class="details-container reveal">
+        <div class="story-box">
+            <h2>INTO THE UNKNOWN</h2>
+            <p>You are the last Void Walker, tasked with charting the edges of the known universe. What starts as a simple survey mission quickly turns into a fight for survival when your AI detects an ancient signal.</p>
+            <p>Land on untouched planets, harvest resources to repair your ship, and decipher alien monoliths. Every star system is unique, and danger lurks in every shadow.</p>
+        </div>
+        
+        <div class="specs-box">
+            <h3 style="font-family:'Orbitron'; margin-bottom:20px;">MISSION DATA</h3>
+            <div class="spec-row"><span>Platform</span> <span>PC Only</span></div>
+            <div class="spec-row"><span>Release</span> <span>Coming Soon</span></div>
+            <div class="spec-row"><span>Type</span> <span>Single Player</span></div>
+            <div class="spec-row"><span>Engine</span> <span>Cosmos Engine</span></div>
+        </div>
+    </div>
+
+    <h2 style="text-align:center; font-family:'Orbitron'; margin-bottom:30px; color:var(--secondary);" class="reveal">PLANETARY LOGS</h2>
+    <div class="gallery reveal">
+        <div class="gallery-img hover-trigger"><img src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=600&q=80" alt="Space 1"></div>
+        <div class="gallery-img hover-trigger"><img src="https://images.unsplash.com/photo-1614730341194-75c60740a070?auto=format&fit=crop&w=600&q=80" alt="Space 2"></div>
+        <div class="gallery-img hover-trigger"><img src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?auto=format&fit=crop&w=600&q=80" alt="Space 3"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 NEXUS GAMING. All rights reserved.</p>
+    </footer>
+
+    <script>
+        window.addEventListener('load', () => { document.getElementById('preloader').style.opacity = '0'; setTimeout(() => { document.getElementById('preloader').style.display = 'none'; }, 500); });
+        
+        const cursor = document.querySelector('.cursor');
+        const hoverTriggers = document.querySelectorAll('.hover-trigger, a, button');
+        document.addEventListener('mousemove', e => { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; });
+        hoverTriggers.forEach(link => { link.addEventListener('mouseenter', () => cursor.classList.add('hovered')); link.addEventListener('mouseleave', () => cursor.classList.remove('hovered')); });
+
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.reveal').forEach(reveal => { if(reveal.getBoundingClientRect().top < window.innerHeight - 150) reveal.classList.add('active'); });
+            if (window.scrollY > 300) backToTop.style.display = 'flex'; else backToTop.style.display = 'none';
+        });
+        backToTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    </script>
+</body>
+</html>
